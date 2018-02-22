@@ -1,4 +1,3 @@
-
 # dependencies
 /node_modules
 
@@ -15,6 +14,8 @@
 .env.test.local
 .env.production.local
 /.idea
+/__pycache__
+/venv
 
 npm-debug.log*
 yarn-debug.log*

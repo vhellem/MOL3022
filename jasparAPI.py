@@ -1,17 +1,93 @@
 import requests
-import json
-import re
+
 import numpy as np
-print("Doing request")
-r = requests.get("http://jaspar.genereg.net/api/v1/matrix/?page_size=800&tax_id=9606")
+import math
 
-print("Request done")
 
-matrix_id = []
-for matrix in r.json()['results']:
-    matrix_id.append(matrix['matrix_id'])
+def get_all_possible_matrixes():
+    print("Doing request")
+    r = requests.get("http://jaspar.genereg.net/api/v1/matrix/?page_size=800&tax_id=9606")
 
-print(matrix_id)
+    print("Request done")
+
+    matrix_id = []
+    for matrix in r.json()['results']:
+        matrix_id.append(matrix['matrix_id'])
+    return matrix_id
+
+
+def pwm(freq, total, bg=0.25):
+    p = (freq+math.sqrt(total)*1/4)/(total+(4*(math.sqrt(total)*1/4)))
+    return math.log(p/bg, 2)
+
+def get_pfm_of_matrix(matrix='MA0634.1'):
+
+    r = requests.get('http://jaspar.genereg.net/api/v1/matrix/' + matrix + "/")
+    pfm = r.json()['pfm']
+
+
+    arr = []
+
+    #This converts the pfm to a pwf matrix, probably in a horrible inefficient way, but I think it works :)
+    for key, value in pfm.items():
+        arr.append(value)
+
+    total = np.sum(arr, axis=0)[0]
+    newRow = []
+    i= 0
+    for row in arr:
+        newRow.append([])
+        for element in row:
+            newElement = pwm(element, total)
+            newRow[i].append(newElement)
+        i += 1
+    i = 0
+    for key, value in pfm.items():
+        pfm[key]=newRow[i]
+        i+= 1
+    return pfm
+
+def get_sequence_probability_from_pwm(pwm, sequence):
+    """
+
+    :param pwm: A a position weight matrix for a given motif
+    :param sequence: A DNA sequence
+    :return: A probability of the motif at all given positions in the sequence
+    """
+    length_of_motif = len(pwm['A'])
+    prob = [0]*(len(sequence)-length_of_motif)
+
+    for i in range(len(sequence)-length_of_motif):
+        seq_score = sum([pwm[sequence[j]][j-i] for j in range(i, i+length_of_motif)])
+        prob[i] = seq_score
+    print(prob)
+    maxProb = max(prob)
+    minProb = min(prob)
+    prob = [(ele-minProb)/(maxProb-minProb) for ele in prob]
+    print(prob)
+    return prob
+
+print(get_sequence_probability_from_pwm(get_pfm_of_matrix('MA0004.1'), "agtCACGTGttcc".upper()))
+
+
+
+"""
+for key, value in matrices.items():
+
+    total = np.sum(value, axis=0)[0]
+    newRow = []
+    i = 0
+    for row in value:
+        newRow.append([])
+        for element in row:
+            element = pwm(element, total)
+            newRow[i].append(element)
+        i += 1
+    newRow = np.array(newRow)
+    matrices[key] = newRow
+
+#print(matrices)
+
 
 
 doRead = True
@@ -26,6 +102,7 @@ with open("matrices.txt") as file:
 
             j += 1
             if linje[1:9] in matrix_id:
+                mat = np.array(mat)
                 matrices[current_m] = mat
                 mat = []
                 current_m = linje[1:9]
@@ -42,6 +119,4 @@ with open("matrices.txt") as file:
             mat.append(temp)
             #print(mat)
             #print(linje)
-print(matrices)
-print(i)
-print(j)
+"""

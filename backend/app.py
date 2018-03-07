@@ -1,6 +1,6 @@
 import requests
-
-from flask import Flask, jsonify
+from jasparAPI import get_all_possible_matrixes, calculate_seq
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 from json import dumps
 
@@ -14,15 +14,24 @@ def hello_world():
 @app.route("/matrices")
 def matrices():
     r = get_matrices()
-    return jsonify(r.text)
+    return jsonify(r)
 
 @app.route("/matrices/<matrix_id>")
 def matrix(matrix_id):
     r = get_matrix(matrix_id)
     return jsonify(r.text)
 
+@app.route("/calculate", methods = ['POST'])
+def calculate():
+
+    data = request.json
+
+    return jsonify(calculate_seq(data['matrix'], data['sequence']))
+
+
+
 def get_matrices():
-    r = requests.get("http://jaspar.genereg.net/api/v1/matrix/?page_size=800&tax_id=9606")
+    r = get_all_possible_matrixes()
     #TODO: Calculate the things
     return r
 

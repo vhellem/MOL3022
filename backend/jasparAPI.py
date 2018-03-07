@@ -67,8 +67,10 @@ def get_sequence_probability_from_pwm(pwm, sequence):
     print(prob)
     return prob
 
-print(get_sequence_probability_from_pwm(get_pfm_of_matrix('MA0004.1'), "agtCACGTGttcc".upper()))
+#print(get_sequence_probability_from_pwm(get_pfm_of_matrix('MA0004.1'), "agtCACGTGttcc".upper()))
 
+def calculate_seq(matrix, sequence):
+    return get_sequence_probability_from_pwm(get_pfm_of_matrix(matrix), sequence.upper())
 
 
 """

@@ -32,7 +32,7 @@ def calculate():
         sequenceData = sequenceData.split(";")
 
 
-    return jsonify(calculate_seq(data['matrix'], sequenceData))
+    return jsonify(calculate_seq(data['matrix'], sequenceData, float(data['background'])))
 
 
 

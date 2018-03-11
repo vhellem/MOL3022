@@ -20,7 +20,13 @@ def pwm(freq, total, bg=0.25):
     p = (freq+math.sqrt(total)*1/4)/(total+(4*(math.sqrt(total)*1/4)))
     return math.log(p/bg, 2)
 
-def get_pfm_of_matrix(matrix='MA0634.1'):
+def get_pfm_of_matrix(matrix='MA0634.1', bg=0.25):
+    """
+
+    :param matrix: A given matrix String to lookup in Jaspar
+    :param bg: A background distribution for the bases
+    :return: A new Position Weight Matrix for the transcription factor
+    """
 
     r = requests.get('http://jaspar.genereg.net/api/v1/matrix/' + matrix + "/")
     pfm = r.json()['pfm']
@@ -38,7 +44,7 @@ def get_pfm_of_matrix(matrix='MA0634.1'):
     for row in arr:
         newRow.append([])
         for element in row:
-            newElement = pwm(element, total)
+            newElement = pwm(element, total, bg)
             newRow[i].append(newElement)
         i += 1
     i = 0
@@ -69,10 +75,10 @@ def get_sequence_probability_from_pwm(pwm, sequence):
 
 #print(get_sequence_probability_from_pwm(get_pfm_of_matrix('MA0004.1'), "agtCACGTGttcc".upper()))
 
-def calculate_seq(matrix, sequence):
+def calculate_seq(matrix, sequence, bg):
 
     if type(sequence) is list:
-        matrix = get_pfm_of_matrix(matrix)
+        matrix = get_pfm_of_matrix(matrix, bg)
         matrixes = []
         for seq in sequence:
 
@@ -80,7 +86,7 @@ def calculate_seq(matrix, sequence):
         return matrixes
 
     else:
-        return get_sequence_probability_from_pwm(get_pfm_of_matrix(matrix), sequence.upper())
+        return get_sequence_probability_from_pwm(get_pfm_of_matrix(matrix, bg), sequence.upper())
 
 
 """

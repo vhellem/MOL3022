@@ -8,10 +8,12 @@ export default class TestData extends Component {
       matrices: [],
       selectedMatrix: '',
       inputValue: '',
+      background: 0.25,
     };
     this.calculatePWMMatrix = this.calculatePWMMatrix.bind(this);
     this.setSelectedMatrix = this.setSelectedMatrix.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.handleBackgroundChange = this.handleBackgroundChange.bind(this);
   }
 
   componentDidMount() {
@@ -39,6 +41,7 @@ export default class TestData extends Component {
       body: JSON.stringify({
         sequence: this.state.inputValue,
         matrix: 'MA0004.1',
+        background: this.state.background,
       }),
       headers: {
         Accept: 'application/json',
@@ -57,6 +60,9 @@ export default class TestData extends Component {
   }
   handleChange(e) {
     this.setState({ inputValue: e.target.value });
+  }
+  handleBackgroundChange(e) {
+    this.setState({ background: parseFloat(e.target.value) });
   }
 
   render() {
@@ -82,6 +88,14 @@ export default class TestData extends Component {
             type="text"
             value={this.state.inputValue}
             onChange={this.handleChange}
+          />
+        </div>
+        <div>
+          <label>Skriv inn bakgrunnsfordelingen for matrisen</label>
+          <input
+            type="number"
+            value={this.state.background}
+            onChange={this.handleBackgroundChange}
           />
         </div>
 

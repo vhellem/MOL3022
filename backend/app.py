@@ -26,7 +26,13 @@ def calculate():
 
     data = request.json
 
-    return jsonify(calculate_seq(data['matrix'], data['sequence']))
+    sequenceData = data['sequence'].strip()
+
+    if ";" in sequenceData:
+        sequenceData = sequenceData.split(";")
+
+
+    return jsonify(calculate_seq(data['matrix'], sequenceData))
 
 
 

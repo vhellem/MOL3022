@@ -70,7 +70,17 @@ def get_sequence_probability_from_pwm(pwm, sequence):
 #print(get_sequence_probability_from_pwm(get_pfm_of_matrix('MA0004.1'), "agtCACGTGttcc".upper()))
 
 def calculate_seq(matrix, sequence):
-    return get_sequence_probability_from_pwm(get_pfm_of_matrix(matrix), sequence.upper())
+
+    if type(sequence) is list:
+        matrix = get_pfm_of_matrix(matrix)
+        matrixes = []
+        for seq in sequence:
+
+            matrixes.append(get_sequence_probability_from_pwm(matrix, seq.strip().upper()))
+        return matrixes
+
+    else:
+        return get_sequence_probability_from_pwm(get_pfm_of_matrix(matrix), sequence.upper())
 
 
 """

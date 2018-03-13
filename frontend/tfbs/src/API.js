@@ -17,6 +17,7 @@ export default class TestData extends Component {
       stepIndex: 0,
       finished: false,
       loading: true,
+      results: null,
     };
     this.calculatePWMMatrix = this.calculatePWMMatrix.bind(this);
     this.setSelectedMatrix = this.setSelectedMatrix.bind(this);
@@ -68,6 +69,7 @@ export default class TestData extends Component {
       .then(data => {
         this.setState({
           loading: false,
+          results: data,
         });
         console.log(data);
       });

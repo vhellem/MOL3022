@@ -1,4 +1,8 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
+import TextField from 'material-ui/TextField';
+import RaisedButton from 'material-ui/RaisedButton';
+import FlatButton from 'material-ui/FlatButton';
+import {Step, Stepper, StepLabel} from 'material-ui/Stepper';
 import Autocomplete from 'react-autocomplete';
 
 export default class TestData extends Component {
@@ -9,97 +13,203 @@ export default class TestData extends Component {
       selectedMatrix: '',
       inputValue: '',
       background: 0.25,
+      stepIndex: 0,
+      finished: false
     };
-    this.calculatePWMMatrix = this.calculatePWMMatrix.bind(this);
-    this.setSelectedMatrix = this.setSelectedMatrix.bind(this);
-    this.handleChange = this.handleChange.bind(this);
-    this.handleBackgroundChange = this.handleBackgroundChange.bind(this);
+    this.calculatePWMMatrix = this
+      .calculatePWMMatrix
+      .bind(this);
+    this.setSelectedMatrix = this
+      .setSelectedMatrix
+      .bind(this);
+    this.handleChange = this
+      .handleChange
+      .bind(this);
+    this.handleBackgroundChange = this
+      .handleBackgroundChange
+      .bind(this);
   }
 
   componentDidMount() {
     fetch('http://localhost:5000/matrices', {
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-    })
+        method: 'GET',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        }
+      })
       .then(results => results.json())
       .then(data => {
         console.log('test');
         console.log(data);
         const matrices = data.map(matrix => {
-          return { label: matrix };
+          return {label: matrix};
         }); //.map(entry => entry.id);
         console.log(matrices);
-        this.setState({ matrices });
+        this.setState({matrices});
       });
   }
   calculatePWMMatrix() {
     fetch('http://localhost:5000/calculate', {
       method: 'POST',
-      body: JSON.stringify({
-        sequence: this.state.inputValue,
-        matrix: 'MA0004.1',
-        background: this.state.background,
-      }),
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-    })
+      body: JSON.stringify({sequence: this.state.inputValue, matrix: 'MA0004.1', background: this.state.background}),
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        }
+      })
       .then(results => results.json())
       .then(data => {
         console.log(data);
       });
   }
+
   setSelectedMatrix(value) {
-    this.setState({
-      selectedMatrix: value,
-    });
-  }
-  handleChange(e) {
-    this.setState({ inputValue: e.target.value });
-  }
-  handleBackgroundChange(e) {
-    this.setState({ background: parseFloat(e.target.value) });
+    this.setState({selectedMatrix: value});
   }
 
-  render() {
-    console.log(this.state.selectedMatrix);
-    return (
-      <div>
-        <Autocomplete
+  handleChange(e) {
+    this.setState({
+      inputValue: e.target.value
+    }, () => console.log(this.state.inputValue));
+  }
+
+  handleBackgroundChange(e) {
+    this.setState({
+      background: parseFloat(e.target.value)
+    });
+  }
+
+  handleNext = () => {
+    const {stepIndex} = this.state;
+    if (stepIndex < 2) {
+      this.setState({
+        stepIndex: stepIndex + 1,
+        finished: stepIndex >= 2
+      });
+    }
+  };
+
+  handlePrev = () => {
+    const {stepIndex} = this.state;
+    if (stepIndex > 0) {
+      this.setState({
+        stepIndex: stepIndex - 1
+      });
+    }
+  };
+
+  getStepContent(stepIndex) {
+    switch (stepIndex) {
+      case 0:
+        return <Autocomplete
           items={this.state.matrices}
-          renderItem={(item, isHighlighted) =>
-            <div style={{ background: isHighlighted ? 'lightgray' : 'white' }}>
-              {item.label}
-            </div>}
+          renderItem={(item, isHighlighted) => <div
+          style={{
+          background: isHighlighted
+            ? 'lightgray'
+            : 'white'
+        }}>
+          {item.label}
+        </div>}
           getItemValue={item => item.label}
           value={this.state.selectedMatrix}
           onChange={e => this.setSelectedMatrix(e.target.value)}
-          onSelect={val => this.setSelectedMatrix(val)}
-        />
-        <div>
-          <label>Skriv inn gensekvenser, separert med semikolon (;)</label>
-          <textarea
-            rows={20}
-            cols={50}
-            type="text"
+          onSelect={val => this.setSelectedMatrix(val)}/>
+      case 1:
+        return <div>
+          <TextField
+            style={{
+            textAlign: 'left',
+          }}
+            floatingLabelText="Skriv inn DNA-sekvens(er):"
+            floatingLabelFixed={true}
+            hintText=""
+            multiLine={true}
+            rows={1}
+            rowsMax={10}
             value={this.state.inputValue}
             onChange={this.handleChange}
-          />
+            />
         </div>
-        <div>
-          <label>Skriv inn bakgrunnsfordelingen for matrisen</label>
-          <input
-            type="number"
-            value={this.state.background}
-            onChange={this.handleBackgroundChange}
-          />
-        </div>
+      case 2:
+        return <TextField
+          style={{
+          textAlign: 'left'
+        }}
+          floatingLabelText="Velg ønsket bakgrunnsfordeling:"
+          floatingLabelFixed={true}
+          value={this.state.background}
+          onChange={this.handleBackgroundChange}/>
+      default:
+        return '-';
+    }
+  }
 
-        <button onClick={this.calculatePWMMatrix}>Let etter sekvens</button>
+  render() {
+    const {finished, stepIndex} = this.state;
+    const contentStyle = {
+      margin: '0 16px'
+    };
+    console.log(this.state.selectedMatrix);
+    return (
+      <div
+        style={{
+        width: '100%',
+        maxWidth: 700,
+        margin: 'auto'
+      }}>
+        <Stepper activeStep={stepIndex}>
+          <Step>
+            <StepLabel>Matrise</StepLabel>
+          </Step>
+          <Step>
+            <StepLabel>DNA-sekvens</StepLabel>
+          </Step>
+          <Step>
+            <StepLabel>Bakgrunnsfordeling</StepLabel>
+          </Step>
+        </Stepper>
+        <div style={contentStyle}>
+          {finished
+            ? (
+              <p>
+                <a
+                  href="#"
+                  onClick={(event) => {
+                  event.preventDefault();
+                  this.setState({stepIndex: 0, finished: false});
+                }}>
+                  Click here
+                </a>
+                to reset the example.
+              </p>
+            )
+            : (
+              <div>
+                {this.getStepContent(stepIndex)}
+                <div style={{
+                  marginTop: 12
+                }}>
+                  <FlatButton
+                    label="Tilbake"
+                    disabled={stepIndex === 0}
+                    onClick={this.handlePrev}
+                    style={{
+                    marginRight: 12
+                  }}/>
+                  <RaisedButton
+                    label={stepIndex === 2
+                    ? 'Let etter sekvens'
+                    : 'Neste'}
+                    primary={true}
+                    onClick={stepIndex === 2
+                    ? this.calculatePWMMatrix
+                    : this.handleNext}/>
+                </div>
+              </div>
+            )}
+        </div>
       </div>
     );
   }

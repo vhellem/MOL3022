@@ -68,17 +68,14 @@ export default class TestData extends Component {
   }
 
   handleChange(e) {
-    this.setState(
-      {
-        inputValue: e.target.value,
-      },
-      () => console.log(this.state.inputValue)
-    );
+    this.setState({
+      inputValue: e.target.value,
+    });
   }
 
   handleBackgroundChange(e) {
     this.setState({
-      background: parseFloat(e.target.value),
+      background: e.target.value,
     });
   }
 

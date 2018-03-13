@@ -3,6 +3,7 @@ import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import FlatButton from 'material-ui/FlatButton';
 import {Step, Stepper, StepLabel} from 'material-ui/Stepper';
+import {Line} from 'react-chartjs-2';
 import Autocomplete from 'react-autocomplete';
 
 export default class TestData extends Component {
@@ -11,10 +12,11 @@ export default class TestData extends Component {
     this.state = {
       matrices: [],
       selectedMatrix: '',
+      responseData: undefined,
       inputValue: '',
       background: 0.25,
       stepIndex: 0,
-      finished: false
+      finished: false,
     };
     this.calculatePWMMatrix = this
       .calculatePWMMatrix
@@ -49,6 +51,7 @@ export default class TestData extends Component {
         this.setState({matrices});
       });
   }
+
   calculatePWMMatrix() {
     fetch('http://localhost:5000/calculate', {
       method: 'POST',
@@ -60,7 +63,8 @@ export default class TestData extends Component {
       })
       .then(results => results.json())
       .then(data => {
-        console.log(data);
+        this.setState({responseData: data});
+        console.log(data)
       });
   }
 
@@ -69,15 +73,11 @@ export default class TestData extends Component {
   }
 
   handleChange(e) {
-    this.setState({
-      inputValue: e.target.value
-    });
+    this.setState({inputValue: e.target.value});
   }
 
   handleBackgroundChange(e) {
-    this.setState({
-      background: e.target.value
-    });
+    this.setState({background: e.target.value});
   }
 
   handleNext = () => {
@@ -104,19 +104,17 @@ export default class TestData extends Component {
       case 0:
         return <Autocomplete
           items={this.state.matrices}
-          menuStyle={
-            {
-              borderRadius: '3px',
-              boxShadow: '0 2px 12px rgba(0, 0, 0, 0.1)',
-              background: 'rgba(255, 255, 255, 0.9)',
-              padding: '2px 0',
-              fontSize: '90%',
-              position: 'fixed',
-              overflow: 'auto',
-              maxHeight: '50%',
-              zIndex: '998',
-              }
-          }
+          menuStyle={{
+          borderRadius: '3px',
+          boxShadow: '0 2px 12px rgba(0, 0, 0, 0.1)',
+          background: 'rgba(255, 255, 255, 0.9)',
+          padding: '2px 0',
+          fontSize: '90%',
+          position: 'fixed',
+          overflow: 'auto',
+          maxHeight: '50%',
+          zIndex: '998'
+        }}
           renderItem={(item, isHighlighted) => <div
           style={{
           background: isHighlighted
@@ -221,6 +219,13 @@ export default class TestData extends Component {
                 </div>
               </div>
             )}
+        </div>
+        <div>
+          {this.state.responseData && 
+          <Line data={{
+            labels: this.state.responseData.map((_, index) => index),
+            datasets: [{ data: this.state.responseData}]
+            }}/>}
         </div>
       </div>
     );

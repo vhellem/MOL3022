@@ -13,13 +13,12 @@ export default class TestData extends Component {
     this.state = {
       matrices: [],
       selectedMatrix: '',
-      //responseData: undefined,
       inputValue: '',
       background: 0.25,
       stepIndex: 0,
       finished: false,
       loading: true,
-      results: null,
+      results: undefined,
     };
     this.calculatePWMMatrix = this.calculatePWMMatrix.bind(this);
     this.setSelectedMatrix = this.setSelectedMatrix.bind(this);
@@ -163,6 +162,19 @@ export default class TestData extends Component {
   }
 
   render() {
+
+    const graph = this.state.results ? Object.keys(this.state.results).map((key, index) => {
+      
+      return (
+      this.state.results[key].map((array, index) => {
+      return (
+      <Line data={{
+          labels: array.map((_, index) => index),
+          datasets: [{ data: array}]
+        }}/>
+      )})
+    )}) : null; 
+    
     const { finished, stepIndex } = this.state;
     const contentStyle = {
       margin: '0 16px',
@@ -228,11 +240,7 @@ export default class TestData extends Component {
               </div>}
         </div>
         <div>
-          {this.state.results && 
-          <Line data={{
-            labels: this.state.results.map((_, index) => index),
-            datasets: [{ data: this.state.results}]
-            }}/>}
+           {graph}         
         </div>
       </div>
     );

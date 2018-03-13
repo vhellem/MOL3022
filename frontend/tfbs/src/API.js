@@ -71,12 +71,12 @@ export default class TestData extends Component {
   handleChange(e) {
     this.setState({
       inputValue: e.target.value
-    }, () => console.log(this.state.inputValue));
+    });
   }
 
   handleBackgroundChange(e) {
     this.setState({
-      background: parseFloat(e.target.value)
+      background: e.target.value
     });
   }
 
@@ -104,6 +104,19 @@ export default class TestData extends Component {
       case 0:
         return <Autocomplete
           items={this.state.matrices}
+          menuStyle={
+            {
+              borderRadius: '3px',
+              boxShadow: '0 2px 12px rgba(0, 0, 0, 0.1)',
+              background: 'rgba(255, 255, 255, 0.9)',
+              padding: '2px 0',
+              fontSize: '90%',
+              position: 'fixed',
+              overflow: 'auto',
+              maxHeight: '50%',
+              zIndex: '998',
+              }
+          }
           renderItem={(item, isHighlighted) => <div
           style={{
           background: isHighlighted
@@ -120,7 +133,7 @@ export default class TestData extends Component {
         return <div>
           <TextField
             style={{
-            textAlign: 'left',
+            textAlign: 'left'
           }}
             floatingLabelText="Skriv inn DNA-sekvens(er):"
             floatingLabelFixed={true}
@@ -129,8 +142,7 @@ export default class TestData extends Component {
             rows={1}
             rowsMax={10}
             value={this.state.inputValue}
-            onChange={this.handleChange}
-            />
+            onChange={this.handleChange}/>
         </div>
       case 2:
         return <TextField

@@ -67,74 +67,26 @@ def get_sequence_probability_from_pwm(pwm, sequence):
         seq_score = sum([pwm[sequence[j]][j-i] for j in range(i, i+length_of_motif)])
         prob[i] = seq_score
     print(prob)
-    maxProb = max(prob)
-    minProb = min(prob)
-    prob = [(ele-minProb)/(maxProb-minProb) for ele in prob]
-    print(prob)
+    #maxProb = max(prob)
+    #minProb = min(prob)
+    #prob = [(ele-minProb)/(maxProb-minProb) for ele in prob]
+    #print(prob)
     return prob
 
 #print(get_sequence_probability_from_pwm(get_pfm_of_matrix('MA0004.1'), "agtCACGTGttcc".upper()))
 
-def calculate_seq(matrix, sequence, bg):
+def calculate_seq(matrices, sequence, bg):
+    m = {}
+    for matrix in matrices:
+        if type(sequence) is list:
+            pfm = get_pfm_of_matrix(matrix, bg)
+            matrixes = []
+            for seq in sequence:
 
-    if type(sequence) is list:
-        matrix = get_pfm_of_matrix(matrix, bg)
-        matrixes = []
-        for seq in sequence:
+                matrixes.append(get_sequence_probability_from_pwm(pfm, seq.strip().upper()))
+            m[matrix] =  matrixes
 
-            matrixes.append(get_sequence_probability_from_pwm(matrix, seq.strip().upper()))
-        return matrixes
+        else:
+            m[matrix] = get_sequence_probability_from_pwm(get_pfm_of_matrix(matrix, bg), sequence.upper())
+    return m
 
-    else:
-        return get_sequence_probability_from_pwm(get_pfm_of_matrix(matrix, bg), sequence.upper())
-
-
-"""
-for key, value in matrices.items():
-
-    total = np.sum(value, axis=0)[0]
-    newRow = []
-    i = 0
-    for row in value:
-        newRow.append([])
-        for element in row:
-            element = pwm(element, total)
-            newRow[i].append(element)
-        i += 1
-    newRow = np.array(newRow)
-    matrices[key] = newRow
-
-#print(matrices)
-
-
-
-doRead = True
-i = 0
-j = 0
-matrices = {}
-current_m = ""
-mat = []
-with open("matrices.txt") as file:
-    for linje in file.readlines():
-        if (linje.startswith(">")):
-
-            j += 1
-            if linje[1:9] in matrix_id:
-                mat = np.array(mat)
-                matrices[current_m] = mat
-                mat = []
-                current_m = linje[1:9]
-                i += 1
-                doRead = True
-            else:
-                doRead =False
-        elif doRead:
-            temp = linje[linje.index("[")+1:linje.index("]")]
-            temp = re.sub(r'\s+', ',', temp)
-            temp = temp[1:-1]
-            temp = temp.split(",")
-            temp = [int(x) for x in temp]
-            mat.append(temp)
-            #print(mat)
-            #print(linje)
-"""

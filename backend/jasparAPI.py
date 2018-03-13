@@ -67,10 +67,10 @@ def get_sequence_probability_from_pwm(pwm, sequence):
         seq_score = sum([pwm[sequence[j]][j-i] for j in range(i, i+length_of_motif)])
         prob[i] = seq_score
     print(prob)
-    maxProb = max(prob)
-    minProb = min(prob)
-    prob = [(ele-minProb)/(maxProb-minProb) for ele in prob]
-    print(prob)
+    #maxProb = max(prob)
+    #minProb = min(prob)
+    #prob = [(ele-minProb)/(maxProb-minProb) for ele in prob]
+    #print(prob)
     return prob
 
 #print(get_sequence_probability_from_pwm(get_pfm_of_matrix('MA0004.1'), "agtCACGTGttcc".upper()))
@@ -79,11 +79,11 @@ def calculate_seq(matrices, sequence, bg):
     m = {}
     for matrix in matrices:
         if type(sequence) is list:
-            matrix = get_pfm_of_matrix(matrix, bg)
+            pfm = get_pfm_of_matrix(matrix, bg)
             matrixes = []
             for seq in sequence:
 
-                matrixes.append(get_sequence_probability_from_pwm(matrix, seq.strip().upper()))
+                matrixes.append(get_sequence_probability_from_pwm(pfm, seq.strip().upper()))
             m[matrix] =  matrixes
 
         else:

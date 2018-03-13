@@ -16,6 +16,7 @@ export default class TestData extends Component {
       background: 0.25,
       stepIndex: 0,
       finished: false,
+      loading: true,
     };
     this.calculatePWMMatrix = this.calculatePWMMatrix.bind(this);
     this.setSelectedMatrix = this.setSelectedMatrix.bind(this);
@@ -35,6 +36,9 @@ export default class TestData extends Component {
       .then(data => {
         console.log('test');
         console.log(data);
+        this.setState({
+          loading: false,
+        });
         const matrices = data.map(matrix => {
           return { label: matrix, value: matrix };
         }); //.map(entry => entry.id);
@@ -43,6 +47,9 @@ export default class TestData extends Component {
       });
   }
   calculatePWMMatrix() {
+    this.setState({
+      loading: true,
+    });
     fetch('http://localhost:5000/calculate', {
       method: 'POST',
       body: JSON.stringify({
@@ -59,6 +66,9 @@ export default class TestData extends Component {
     })
       .then(results => results.json())
       .then(data => {
+        this.setState({
+          loading: false,
+        });
         console.log(data);
       });
   }
@@ -99,6 +109,9 @@ export default class TestData extends Component {
   };
 
   getStepContent(stepIndex) {
+    if (this.state.loading) {
+      return <h3>Laster inn data</h3>;
+    }
     switch (stepIndex) {
       case 0:
         const { selectedMatrix } = this.state;
@@ -151,7 +164,6 @@ export default class TestData extends Component {
     const contentStyle = {
       margin: '0 16px',
     };
-    console.log(this.state.selectedMatrix);
     return (
       <div
         style={{

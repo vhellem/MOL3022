@@ -1,9 +1,9 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import FlatButton from 'material-ui/FlatButton';
-import { Step, Stepper, StepLabel } from 'material-ui/Stepper';
-import { Line } from 'react-chartjs-2';
+import {Step, Stepper, StepLabel} from 'material-ui/Stepper';
+import { Bar } from 'react-chartjs-2'
 import Select from 'react-select';
 import 'react-select/dist/react-select.css';
 
@@ -19,98 +19,110 @@ export default class TestData extends Component {
       finished: false,
       loading: true,
       results: undefined,
+      fieldHasError: undefined
     };
-    this.calculatePWMMatrix = this.calculatePWMMatrix.bind(this);
-    this.setSelectedMatrix = this.setSelectedMatrix.bind(this);
-    this.handleChange = this.handleChange.bind(this);
-    this.handleBackgroundChange = this.handleBackgroundChange.bind(this);
+    this.calculatePWMMatrix = this
+      .calculatePWMMatrix
+      .bind(this);
+    this.setSelectedMatrix = this
+      .setSelectedMatrix
+      .bind(this);
+    this.handleChange = this
+      .handleChange
+      .bind(this);
+    this.handleBackgroundChange = this
+      .handleBackgroundChange
+      .bind(this);
+    this.handleInputChange = this
+      .handleInputChange
+      .bind(this);
+
   }
 
   componentDidMount() {
     fetch('http://localhost:5000/matrices', {
-      method: 'GET',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-    })
+        method: 'GET',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        }
+      })
       .then(results => results.json())
       .then(data => {
         console.log('test');
         console.log(data);
-        this.setState({
-          loading: false,
-        });
+        this.setState({loading: false});
         const matrices = data.map(matrix => {
-          return { label: matrix, value: matrix };
+          return {label: matrix, value: matrix};
         }); //.map(entry => entry.id);
         console.log(matrices);
-        this.setState({ matrices });
+        this.setState({matrices});
       });
   }
 
   calculatePWMMatrix() {
-    this.setState({
-      loading: true,
-    });
+    this.setState({loading: true});
     fetch('http://localhost:5000/calculate', {
       method: 'POST',
       body: JSON.stringify({
         sequence: this.state.inputValue,
-        matrix: this.state.selectedMatrix.map(matrix => {
-          return matrix.value;
-        }),
-        background: this.state.background,
+        matrix: this
+          .state
+          .selectedMatrix
+          .map(matrix => {
+            return matrix.value;
+          }),
+        background: this.state.background
       }),
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-    })
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        }
+      })
       .then(results => results.json())
       .then(data => {
-        this.setState({
-          loading: false,
-          results: data,
-        });
+        this.setState({loading: false, results: data});
         console.log(data);
       });
   }
 
   setSelectedMatrix(selectedOption) {
-    this.setState({ selectedMatrix: selectedOption });
+    this.setState({selectedMatrix: selectedOption});
   }
 
   handleChange(e) {
-    this.setState({
-      inputValue: e.target.value,
-    });
+    this.setState({inputValue: e.target.value});
   }
 
   handleBackgroundChange(e) {
-    this.setState({
-      background: e.target.value,
-    });
+    this.setState({background: e.target.value});
   }
 
   handleNext = () => {
-    const { stepIndex } = this.state;
+    const {stepIndex} = this.state;
     if (stepIndex < 2) {
       this.setState({
         stepIndex: stepIndex + 1,
-        finished: stepIndex >= 2,
+        finished: stepIndex >= 2
       });
     }
   };
 
   handlePrev = () => {
-    const { stepIndex } = this.state;
+    const {stepIndex} = this.state;
     if (stepIndex > 0) {
       this.setState({
-        stepIndex: stepIndex - 1,
+        stepIndex: stepIndex - 1
       });
     }
   };
+
+  handleInputChange(e) {
+    this.setState({
+      inputValue: e.target.value,
+      fieldHasError: !/^[AaCcGgTt]*$/.test(e.target.value)
+    });
+  }
 
   getStepContent(stepIndex) {
     if (this.state.loading) {
@@ -118,23 +130,20 @@ export default class TestData extends Component {
     }
     switch (stepIndex) {
       case 0:
-        const { selectedMatrix } = this.state;
-        return (
-          <Select
-            name="select matrix"
-            value={selectedMatrix}
-            onChange={this.setSelectedMatrix}
-            options={this.state.matrices}
-            multi={true}
-          />
-        );
+        const {selectedMatrix} = this.state;
+        return (<Select
+          name="select matrix"
+          value={selectedMatrix}
+          onChange={this.setSelectedMatrix}
+          options={this.state.matrices}
+          multi={true}/>);
       case 1:
         return (
           <div>
             <TextField
               style={{
-                textAlign: 'left',
-              }}
+              textAlign: 'left'
+            }}
               floatingLabelText="Skriv inn DNA-sekvens(er):"
               floatingLabelFixed={true}
               hintText=""
@@ -142,22 +151,19 @@ export default class TestData extends Component {
               rows={1}
               rowsMax={10}
               value={this.state.inputValue}
-              onChange={this.handleChange}
-            />
+              onChange={this.handleInputChange}
+              errorText={this.state.fieldHasError && "Ugyldig nukleobase."}/>
           </div>
         );
       case 2:
-        return (
-          <TextField
-            style={{
-              textAlign: 'left',
-            }}
-            floatingLabelText="Velg ønsket bakgrunnsfordeling:"
-            floatingLabelFixed={true}
-            value={this.state.background}
-            onChange={this.handleBackgroundChange}
-          />
-        );
+        return (<TextField
+          style={{
+          textAlign: 'left'
+        }}
+          floatingLabelText="Velg ønsket bakgrunnsfordeling:"
+          floatingLabelFixed={true}
+          value={this.state.background}
+          onChange={this.handleBackgroundChange}/>);
       default:
         return '-';
     }
@@ -172,37 +178,53 @@ export default class TestData extends Component {
     }
 
     const graph = this.state.results
-      ? Object.keys(this.state.results).map((key, index) => {
-          return this.state.results[key].map((array, index) => {
-            return (
-              <div>
-                <p>
-                  Søker på sekvens "{sequences[index]}" i binding "{key}"
-                </p>
-                <Line
-                  data={{
+      ? Object
+        .keys(this.state.results)
+        .map((key, index) => {
+          return this
+            .state
+            .results[key]
+            .map((array, index) => {
+              return (
+                <div>
+                  <p>
+                    Resultat for om binding "{key}" eksisterer i sekvens "{sequences[index]}"
+                  </p>
+                  <Bar
+                    data={{
                     labels: array.map((_, index) => index),
-                    datasets: [{ data: array }],
+                    datasets: [
+                      {
+                        backgroundColor: 'rgba(31,188,209,0.2)',
+                        data: array
+                      }
+                    ]
                   }}
-                />
-              </div>
-            );
-          });
+                    width={100}
+                    height={100}
+                    options={{
+                    legend: {
+                      display: false
+                    },
+                    maintainAspectRatio: false
+                  }}/>
+                </div>
+              );
+            });
         })
       : null;
 
-    const { finished, stepIndex } = this.state;
+    const {finished, stepIndex} = this.state;
     const contentStyle = {
-      margin: '0 16px',
+      margin: '0 16px'
     };
     return (
       <div
         style={{
-          width: '100%',
-          maxWidth: 700,
-          margin: 'auto',
-        }}
-      >
+        width: '100%',
+        maxWidth: 700,
+        margin: 'auto'
+      }}>
         <Stepper activeStep={stepIndex}>
           <Step>
             <StepLabel>Matrise</StepLabel>
@@ -220,40 +242,35 @@ export default class TestData extends Component {
                 <a
                   href="#"
                   onClick={event => {
-                    event.preventDefault();
-                    this.setState({ stepIndex: 0, finished: false });
-                  }}
-                >
+                  event.preventDefault();
+                  this.setState({stepIndex: 0, finished: false});
+                }}>
                   Click here
                 </a>
                 to reset the example.
               </p>
             : <div>
-                {this.getStepContent(stepIndex)}
-                <div
+              {this.getStepContent(stepIndex)}
+              <div style={{
+                marginTop: 12
+              }}>
+                <FlatButton
+                  label="Tilbake"
+                  disabled={stepIndex === 0}
+                  onClick={this.handlePrev}
                   style={{
-                    marginTop: 12,
-                  }}
-                >
-                  <FlatButton
-                    label="Tilbake"
-                    disabled={stepIndex === 0}
-                    onClick={this.handlePrev}
-                    style={{
-                      marginRight: 12,
-                    }}
-                  />
-                  <RaisedButton
-                    label={stepIndex === 2 ? 'Let etter sekvens' : 'Neste'}
-                    primary={true}
-                    onClick={
-                      stepIndex === 2
-                        ? this.calculatePWMMatrix
-                        : this.handleNext
-                    }
-                  />
-                </div>
-              </div>}
+                  marginRight: 12
+                }}/>
+                <RaisedButton
+                  label={stepIndex === 2
+                  ? 'Let etter sekvens'
+                  : 'Neste'}
+                  primary={true}
+                  onClick={stepIndex === 2
+                  ? this.calculatePWMMatrix
+                  : this.handleNext}/>
+              </div>
+            </div>}
         </div>
         <div>
           {graph}

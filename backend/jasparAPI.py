@@ -31,7 +31,6 @@ def get_pfm_of_matrix(matrix='MA0634.1', bg=0.25):
     r = requests.get('http://jaspar.genereg.net/api/v1/matrix/' + matrix + "/")
     pfm = r.json()['pfm']
 
-
     arr = []
 
     #This converts the pfm to a pwf matrix, probably in a horrible inefficient way, but I think it works :)
@@ -87,6 +86,6 @@ def calculate_seq(matrices, sequence, bg):
             m[matrix] =  matrixes
 
         else:
-            m[matrix] = get_sequence_probability_from_pwm(get_pfm_of_matrix(matrix, bg), sequence.upper())
+            m[matrix] = [get_sequence_probability_from_pwm(get_pfm_of_matrix(matrix, bg), sequence.upper())]
     return m
 

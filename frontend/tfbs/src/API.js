@@ -120,7 +120,7 @@ export default class TestData extends Component {
   handleInputChange(e) {
     this.setState({
       inputValue: e.target.value,
-      fieldHasError: !/^[AaCcGgTt]*$/.test(e.target.value)
+      fieldHasError: !/^[AaCcGgTt;]*$/.test(e.target.value)
     });
   }
 

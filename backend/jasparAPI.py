@@ -31,7 +31,6 @@ def get_pfm_of_matrix(matrix='MA0634.1', bg=0.25):
     r = requests.get('http://jaspar.genereg.net/api/v1/matrix/' + matrix + "/")
     pfm = r.json()['pfm']
 
-
     arr = []
 
     #This converts the pfm to a pwf matrix, probably in a horrible inefficient way, but I think it works :)

@@ -147,7 +147,8 @@ export default class TestData extends Component {
           </div>
         );
       case 2:
-        return <TextField
+        return (
+          <TextField
             style={{
               textAlign: 'left',
             }}
@@ -156,25 +157,40 @@ export default class TestData extends Component {
             value={this.state.background}
             onChange={this.handleBackgroundChange}
           />
+        );
       default:
         return '-';
     }
   }
 
   render() {
+    let sequences = this.state.inputValue;
+    if (sequences.indexOf(';') !== -1) {
+      sequences = sequences.split(';');
+    } else {
+      sequences = [sequences];
+    }
 
-    const graph = this.state.results ? Object.keys(this.state.results).map((key, index) => {
-      
-      return (
-      this.state.results[key].map((array, index) => {
-      return (
-      <Line data={{
-          labels: array.map((_, index) => index),
-          datasets: [{ data: array}]
-        }}/>
-      )})
-    )}) : null; 
-    
+    const graph = this.state.results
+      ? Object.keys(this.state.results).map((key, index) => {
+          return this.state.results[key].map((array, index) => {
+            return (
+              <div>
+                <p>
+                  Søker på sekvens "{sequences[index]}" i binding "{key}"
+                </p>
+                <Line
+                  data={{
+                    labels: array.map((_, index) => index),
+                    datasets: [{ data: array }],
+                  }}
+                />
+              </div>
+            );
+          });
+        })
+      : null;
+
     const { finished, stepIndex } = this.state;
     const contentStyle = {
       margin: '0 16px',
@@ -240,7 +256,7 @@ export default class TestData extends Component {
               </div>}
         </div>
         <div>
-           {graph}         
+          {graph}
         </div>
       </div>
     );

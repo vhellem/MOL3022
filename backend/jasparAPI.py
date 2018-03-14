@@ -77,6 +77,7 @@ def get_sequence_probability_from_pwm(pwm, sequence):
 def calculate_seq(matrices, sequence, bg):
     m = {}
     for matrix in matrices:
+        print(matrix)
         if type(sequence) is list:
             pfm = get_pfm_of_matrix(matrix, bg)
             matrixes = []

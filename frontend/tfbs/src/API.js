@@ -3,6 +3,7 @@ import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import FlatButton from 'material-ui/FlatButton';
 import { Step, Stepper, StepLabel } from 'material-ui/Stepper';
+import { Line } from 'react-chartjs-2';
 import Select from 'react-select';
 import 'react-select/dist/react-select.css';
 
@@ -17,7 +18,7 @@ export default class TestData extends Component {
       stepIndex: 0,
       finished: false,
       loading: true,
-      results: null,
+      results: undefined,
     };
     this.calculatePWMMatrix = this.calculatePWMMatrix.bind(this);
     this.setSelectedMatrix = this.setSelectedMatrix.bind(this);
@@ -47,6 +48,7 @@ export default class TestData extends Component {
         this.setState({ matrices });
       });
   }
+
   calculatePWMMatrix() {
     this.setState({
       loading: true,
@@ -145,8 +147,7 @@ export default class TestData extends Component {
           </div>
         );
       case 2:
-        return (
-          <TextField
+        return <TextField
             style={{
               textAlign: 'left',
             }}
@@ -155,13 +156,25 @@ export default class TestData extends Component {
             value={this.state.background}
             onChange={this.handleBackgroundChange}
           />
-        );
       default:
         return '-';
     }
   }
 
   render() {
+
+    const graph = this.state.results ? Object.keys(this.state.results).map((key, index) => {
+      
+      return (
+      this.state.results[key].map((array, index) => {
+      return (
+      <Line data={{
+          labels: array.map((_, index) => index),
+          datasets: [{ data: array}]
+        }}/>
+      )})
+    )}) : null; 
+    
     const { finished, stepIndex } = this.state;
     const contentStyle = {
       margin: '0 16px',
@@ -225,6 +238,9 @@ export default class TestData extends Component {
                   />
                 </div>
               </div>}
+        </div>
+        <div>
+           {graph}         
         </div>
       </div>
     );

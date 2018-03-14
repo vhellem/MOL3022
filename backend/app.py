@@ -31,11 +31,7 @@ def calculate():
     if ";" in sequenceData:
         sequenceData = sequenceData.split(";")
 
-
-
     return jsonify(calculate_seq(data['matrix'], sequenceData, float(data['background'])))
-
-
 
 def get_matrices():
     r = get_all_possible_matrixes()

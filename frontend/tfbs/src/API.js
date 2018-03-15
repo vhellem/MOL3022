@@ -1,11 +1,13 @@
-import React, { Component } from 'react';
+import React, { Component}  from 'react';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import FlatButton from 'material-ui/FlatButton';
+import Dialog from 'material-ui/Dialog';
 import { Step, Stepper, StepLabel } from 'material-ui/Stepper';
-import { Bar } from 'react-chartjs-2'
+import { Bar, Chart } from 'react-chartjs-2'
 import Select from 'react-select';
 import 'react-select/dist/react-select.css';
+import * as zoom from 'chartjs-plugin-zoom';
 
 export default class TestData extends Component {
   constructor(props) {
@@ -21,6 +23,7 @@ export default class TestData extends Component {
       results: undefined,
       inputFieldHasError: undefined,
       backgroundFieldHasError: undefined,
+      open: false
     };
     this.calculatePWMMatrix = this
       .calculatePWMMatrix
@@ -34,7 +37,6 @@ export default class TestData extends Component {
     this.handleSequenceInputChange = this
       .handleSequenceInputChange
       .bind(this);
-
   }
 
   componentDidMount() {
@@ -52,10 +54,13 @@ export default class TestData extends Component {
         this.setState({loading: false});
         const matrices = data.map(matrix => {
           return {label: matrix, value: matrix};
-        }); //.map(entry => entry.id);
+        });
         console.log(matrices);
         this.setState({matrices});
       });
+    Chart
+      .plugins
+      .register(zoom)
   }
 
   calculatePWMMatrix() {
@@ -93,7 +98,7 @@ export default class TestData extends Component {
       background: e.target.value,
       backgroundFieldHasError: !/[+-]?([0-9]*[.])?[0-9]+$/.test(e.target.value)
     });
-    
+
   }
 
   handleNext = () => {
@@ -115,6 +120,14 @@ export default class TestData extends Component {
       });
     }
   };
+
+  handleOpen = () => {
+    this.setState({open: true});
+  }
+
+  handleClose = () => {
+    this.setState({open: false})
+  }
 
   handleSequenceInputChange(e) {
     this.setState({
@@ -141,7 +154,7 @@ export default class TestData extends Component {
           <div>
             <TextField
               style={{
-              textAlign: 'left',
+              textAlign: 'left'
             }}
               floatingLabelText="Skriv inn DNA-sekvens(er), separert med semikolon:"
               floatingLabelFixed={true}
@@ -192,29 +205,6 @@ export default class TestData extends Component {
                     Resultat for om binding "{key}" eksisterer i sekvens "{sequences[index]}"
                   </p>
                   <Bar
-                    options={{
-                    legend: {
-                      display: true
-                    },
-                    scales: {
-                      xAxes: [
-                        {
-                          scaleLabel: {
-                            display: true,
-                            labelString: 'Weeks'
-                          }
-                        }
-                      ],
-                      yAxes: [
-                        {
-                          scaleLabel: {
-                            display: true,
-                            labelString: 'Lalala'
-                          }
-                        }
-                      ]
-                    }
-                  }}
                     data={{
                     labels: array.map((_, index) => index),
                     datasets: [
@@ -227,6 +217,14 @@ export default class TestData extends Component {
                     width={100}
                     height={100}
                     options={{
+                    pan: {
+                      enabled: true,
+                      mode: 'x'
+                    },
+                    zoom: {
+                      enabled: true,
+                      mode: 'x'
+                    },
                     legend: {
                       display: false
                     },
@@ -260,6 +258,14 @@ export default class TestData extends Component {
     const contentStyle = {
       margin: '0 16px'
     };
+    const actions = [< FlatButton label = "Cancel" primary = {
+        true
+      }
+      onClick = {
+        this.handleClose
+      } />];
+
+    const displayHelpButton = this.state.results !== undefined;
     return (
       <div
         style={{
@@ -286,11 +292,9 @@ export default class TestData extends Component {
                   onClick={event => {
                   event.preventDefault();
                   this.setState({stepIndex: 0, finished: false});
-                }}>
-                  Click here
-                </a>
-                to reset the example.
+                }}></a>
               </p>
+
             : <div>
               {this.getStepContent(stepIndex)}
               <div style={{

@@ -1,8 +1,8 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import FlatButton from 'material-ui/FlatButton';
-import {Step, Stepper, StepLabel} from 'material-ui/Stepper';
+import { Step, Stepper, StepLabel } from 'material-ui/Stepper';
 import { Bar } from 'react-chartjs-2'
 import Select from 'react-select';
 import 'react-select/dist/react-select.css';
@@ -19,7 +19,8 @@ export default class TestData extends Component {
       finished: false,
       loading: true,
       results: undefined,
-      fieldHasError: undefined
+      inputFieldHasError: undefined,
+      backgroundFieldHasError: undefined,
     };
     this.calculatePWMMatrix = this
       .calculatePWMMatrix
@@ -27,14 +28,11 @@ export default class TestData extends Component {
     this.setSelectedMatrix = this
       .setSelectedMatrix
       .bind(this);
-    this.handleChange = this
-      .handleChange
-      .bind(this);
     this.handleBackgroundChange = this
       .handleBackgroundChange
       .bind(this);
-    this.handleInputChange = this
-      .handleInputChange
+    this.handleSequenceInputChange = this
+      .handleSequenceInputChange
       .bind(this);
 
   }
@@ -90,12 +88,12 @@ export default class TestData extends Component {
     this.setState({selectedMatrix: selectedOption});
   }
 
-  handleChange(e) {
-    this.setState({inputValue: e.target.value});
-  }
-
   handleBackgroundChange(e) {
-    this.setState({background: e.target.value});
+    this.setState({
+      background: e.target.value,
+      backgroundFieldHasError: !/[+-]?([0-9]*[.])?[0-9]+$/.test(e.target.value)
+    });
+    
   }
 
   handleNext = () => {
@@ -112,15 +110,16 @@ export default class TestData extends Component {
     const {stepIndex} = this.state;
     if (stepIndex > 0) {
       this.setState({
-        stepIndex: stepIndex - 1
+        stepIndex: stepIndex - 1,
+        results: undefined
       });
     }
   };
 
-  handleInputChange(e) {
+  handleSequenceInputChange(e) {
     this.setState({
       inputValue: e.target.value,
-      fieldHasError: !/^[AaCcGgTt;]*$/.test(e.target.value)
+      inputFieldHasError: !/^[AaCcGgTtNn;]*$/.test(e.target.value)
     });
   }
 
@@ -142,17 +141,18 @@ export default class TestData extends Component {
           <div>
             <TextField
               style={{
-              textAlign: 'left'
+              textAlign: 'left',
             }}
-              floatingLabelText="Skriv inn DNA-sekvens(er):"
+              floatingLabelText="Skriv inn DNA-sekvens(er), separert med semikolon:"
               floatingLabelFixed={true}
               hintText=""
               multiLine={true}
               rows={1}
               rowsMax={10}
               value={this.state.inputValue}
-              onChange={this.handleInputChange}
-              errorText={this.state.fieldHasError && "Ugyldig nukleobase."}/>
+              onChange={this.handleSequenceInputChange}
+              fullWidth={true}
+              errorText={this.state.inputFieldHasError && "Ugyldig tegn i sekvens."}/>
           </div>
         );
       case 2:
@@ -163,7 +163,8 @@ export default class TestData extends Component {
           floatingLabelText="Velg ønsket bakgrunnsfordeling:"
           floatingLabelFixed={true}
           value={this.state.background}
-          onChange={this.handleBackgroundChange}/>);
+          onChange={this.handleBackgroundChange}
+          errorText={this.state.backgroundFieldHasError && "Ugyldig bakgrunnsfordeling."}/>);
       default:
         return '-';
     }
@@ -191,6 +192,29 @@ export default class TestData extends Component {
                     Resultat for om binding "{key}" eksisterer i sekvens "{sequences[index]}"
                   </p>
                   <Bar
+                    options={{
+                    legend: {
+                      display: true
+                    },
+                    scales: {
+                      xAxes: [
+                        {
+                          scaleLabel: {
+                            display: true,
+                            labelString: 'Weeks'
+                          }
+                        }
+                      ],
+                      yAxes: [
+                        {
+                          scaleLabel: {
+                            display: true,
+                            labelString: 'Lalala'
+                          }
+                        }
+                      ]
+                    }
+                  }}
                     data={{
                     labels: array.map((_, index) => index),
                     datasets: [
@@ -206,7 +230,25 @@ export default class TestData extends Component {
                     legend: {
                       display: false
                     },
-                    maintainAspectRatio: false
+                    maintainAspectRatio: false,
+                    scales: {
+                      xAxes: [
+                        {
+                          scaleLabel: {
+                            display: true,
+                            labelString: 'Posisjon'
+                          }
+                        }
+                      ],
+                      yAxes: [
+                        {
+                          scaleLabel: {
+                            display: true,
+                            labelString: 'Verdi'
+                          }
+                        }
+                      ]
+                    }
                   }}/>
                 </div>
               );

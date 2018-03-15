@@ -29,7 +29,7 @@ export default class TestData extends Component {
   }
 
   componentDidMount() {
-    fetch("http://localhost:5000/matrices", {
+    fetch("https://mol3022-backend.herokuapp.com/matrices", {
       method: "GET",
       headers: {
         Accept: "application/json",
@@ -51,7 +51,7 @@ export default class TestData extends Component {
 
   calculatePWMMatrix() {
     this.setState({ loading: true });
-    fetch("http://localhost:5000/calculate", {
+    fetch("https://mol3022-backend.herokuapp.com/calculate", {
       method: "POST",
       body: JSON.stringify({
         sequence: this.state.inputValue,

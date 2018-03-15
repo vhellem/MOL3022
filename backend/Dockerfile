@@ -7,10 +7,7 @@ ADD . /app
 
 RUN pip3 install --no-cache-dir -q -r requirements.txt
 
-EXPOSE 5000
-
 RUN adduser -D myuser
 USER myuser
 
-
-CMD gunicorn --bind 0.0.0.0:5000 wsgi
+CMD gunicorn --bind 0.0.0.0:$PORT wsgi

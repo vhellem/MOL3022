@@ -14,8 +14,8 @@ export default class TestData extends Component {
     super(props);
     this.state = {
       matrices: [],
-      selectedMatrix: '',
-      inputValue: '',
+      selectedMatrix: "",
+      inputValue: "",
       background: 0.25,
       stepIndex: 0,
       finished: false,
@@ -25,38 +25,30 @@ export default class TestData extends Component {
       backgroundFieldHasError: undefined,
       open: false
     };
-    this.calculatePWMMatrix = this
-      .calculatePWMMatrix
-      .bind(this);
-    this.setSelectedMatrix = this
-      .setSelectedMatrix
-      .bind(this);
-    this.handleBackgroundChange = this
-      .handleBackgroundChange
-      .bind(this);
-    this.handleSequenceInputChange = this
-      .handleSequenceInputChange
-      .bind(this);
+    this.calculatePWMMatrix = this.calculatePWMMatrix.bind(this);
+    this.setSelectedMatrix = this.setSelectedMatrix.bind(this);
+    this.handleBackgroundChange = this.handleBackgroundChange.bind(this);
+    this.handleSequenceInputChange = this.handleSequenceInputChange.bind(this);
   }
 
   componentDidMount() {
-    fetch('http://localhost:5000/matrices', {
-        method: 'GET',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json'
-        }
-      })
+    fetch("https://mol3022-backend.herokuapp.com/matrices", {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      }
+    })
       .then(results => results.json())
       .then(data => {
-        console.log('test');
+        console.log("test");
         console.log(data);
-        this.setState({loading: false});
+        this.setState({ loading: false });
         const matrices = data.map(matrix => {
           return {label: matrix, value: matrix};
         });
         console.log(matrices);
-        this.setState({matrices});
+        this.setState({ matrices });
       });
     Chart
       .plugins
@@ -64,33 +56,30 @@ export default class TestData extends Component {
   }
 
   calculatePWMMatrix() {
-    this.setState({loading: true});
-    fetch('http://localhost:5000/calculate', {
-      method: 'POST',
+    this.setState({ loading: true });
+    fetch("https://mol3022-backend.herokuapp.com/calculate", {
+      method: "POST",
       body: JSON.stringify({
         sequence: this.state.inputValue,
-        matrix: this
-          .state
-          .selectedMatrix
-          .map(matrix => {
-            return matrix.value;
-          }),
+        matrix: this.state.selectedMatrix.map(matrix => {
+          return matrix.value;
+        }),
         background: this.state.background
       }),
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json'
-        }
-      })
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      }
+    })
       .then(results => results.json())
       .then(data => {
-        this.setState({loading: false, results: data});
+        this.setState({ loading: false, results: data });
         console.log(data);
       });
   }
 
   setSelectedMatrix(selectedOption) {
-    this.setState({selectedMatrix: selectedOption});
+    this.setState({ selectedMatrix: selectedOption });
   }
 
   handleBackgroundChange(e) {
@@ -98,11 +87,10 @@ export default class TestData extends Component {
       background: e.target.value,
       backgroundFieldHasError: !/[+-]?([0-9]*[.])?[0-9]+$/.test(e.target.value)
     });
-
   }
 
   handleNext = () => {
-    const {stepIndex} = this.state;
+    const { stepIndex } = this.state;
     if (stepIndex < 2) {
       this.setState({
         stepIndex: stepIndex + 1,
@@ -112,7 +100,7 @@ export default class TestData extends Component {
   };
 
   handlePrev = () => {
-    const {stepIndex} = this.state;
+    const { stepIndex } = this.state;
     if (stepIndex > 0) {
       this.setState({
         stepIndex: stepIndex - 1,
@@ -142,13 +130,16 @@ export default class TestData extends Component {
     }
     switch (stepIndex) {
       case 0:
-        const {selectedMatrix} = this.state;
-        return (<Select
-          name="select matrix"
-          value={selectedMatrix}
-          onChange={this.setSelectedMatrix}
-          options={this.state.matrices}
-          multi={true}/>);
+        const { selectedMatrix } = this.state;
+        return (
+          <Select
+            name="select matrix"
+            value={selectedMatrix}
+            onChange={this.setSelectedMatrix}
+            options={this.state.matrices}
+            multi={true}
+          />
+        );
       case 1:
         return (
           <div>
@@ -165,51 +156,80 @@ export default class TestData extends Component {
               value={this.state.inputValue}
               onChange={this.handleSequenceInputChange}
               fullWidth={true}
-              errorText={this.state.inputFieldHasError && "Ugyldig tegn i sekvens."}/>
+              errorText={
+                this.state.inputFieldHasError && "Ugyldig tegn i sekvens."
+              }
+            />
           </div>
         );
       case 2:
-        return (<TextField
-          style={{
-          textAlign: 'left'
-        }}
-          floatingLabelText="Velg ønsket bakgrunnsfordeling:"
-          floatingLabelFixed={true}
-          value={this.state.background}
-          onChange={this.handleBackgroundChange}
-          errorText={this.state.backgroundFieldHasError && "Ugyldig bakgrunnsfordeling."}/>);
+        return (
+          <TextField
+            style={{
+              textAlign: "left"
+            }}
+            floatingLabelText="Velg ønsket bakgrunnsfordeling:"
+            floatingLabelFixed={true}
+            value={this.state.background}
+            onChange={this.handleBackgroundChange}
+            errorText={
+              this.state.backgroundFieldHasError &&
+              "Ugyldig bakgrunnsfordeling."
+            }
+          />
+        );
       default:
-        return '-';
+        return "-";
     }
   }
 
   render() {
     let sequences = this.state.inputValue;
-    if (sequences.indexOf(';') !== -1) {
-      sequences = sequences.split(';');
+    if (sequences.indexOf(";") !== -1) {
+      sequences = sequences.split(";");
     } else {
       sequences = [sequences];
     }
 
     const graph = this.state.results
-      ? Object
-        .keys(this.state.results)
-        .map((key, index) => {
-          return this
-            .state
-            .results[key]
-            .map((array, index) => {
-              return (
-                <div>
-                  <p>
-                    Resultat for om binding "{key}" eksisterer i sekvens "{sequences[index]}"
-                  </p>
-                  <Bar
-                    data={{
+      ? Object.keys(this.state.results).map((key, index) => {
+          return this.state.results[key].map((array, index) => {
+            return (
+              <div>
+                <p>
+                  Resultat for om binding "{key}" eksisterer i sekvens "{
+                    sequences[index]
+                  }"
+                </p>
+                <Bar
+                  options={{
+                    legend: {
+                      display: true
+                    },
+                    scales: {
+                      xAxes: [
+                        {
+                          scaleLabel: {
+                            display: true,
+                            labelString: "Weeks"
+                          }
+                        }
+                      ],
+                      yAxes: [
+                        {
+                          scaleLabel: {
+                            display: true,
+                            labelString: "Lalala"
+                          }
+                        }
+                      ]
+                    }
+                  }}
+                  data={{
                     labels: array.map((_, index) => index),
                     datasets: [
                       {
-                        backgroundColor: 'rgba(31,188,209,0.2)',
+                        backgroundColor: "rgba(31,188,209,0.2)",
                         data: array
                       }
                     ]
@@ -234,7 +254,7 @@ export default class TestData extends Component {
                         {
                           scaleLabel: {
                             display: true,
-                            labelString: 'Posisjon'
+                            labelString: "Posisjon"
                           }
                         }
                       ],
@@ -242,21 +262,22 @@ export default class TestData extends Component {
                         {
                           scaleLabel: {
                             display: true,
-                            labelString: 'Verdi'
+                            labelString: "Verdi"
                           }
                         }
                       ]
                     }
-                  }}/>
-                </div>
-              );
-            });
+                  }}
+                />
+              </div>
+            );
+          });
         })
       : null;
 
-    const {finished, stepIndex} = this.state;
+    const { finished, stepIndex } = this.state;
     const contentStyle = {
-      margin: '0 16px'
+      margin: "0 16px"
     };
     const actions = [< FlatButton label = "Cancel" primary = {
         true
@@ -269,10 +290,11 @@ export default class TestData extends Component {
     return (
       <div
         style={{
-        width: '100%',
-        maxWidth: 700,
-        margin: 'auto'
-      }}>
+          width: "100%",
+          maxWidth: 700,
+          margin: "auto"
+        }}
+      >
         <Stepper activeStep={stepIndex}>
           <Step>
             <StepLabel>Matrise</StepLabel>
@@ -285,42 +307,64 @@ export default class TestData extends Component {
           </Step>
         </Stepper>
         <div style={contentStyle}>
-          {finished
-            ? <p>
-                <a
-                  href="#"
-                  onClick={event => {
+          {finished ? (
+            <p>
+              <a
+                href="#"
+                onClick={event => {
                   event.preventDefault();
                   this.setState({stepIndex: 0, finished: false});
-                }}></a>
+                }}>
+                </a>
               </p>
 
-            : <div>
+              ): (
+            <div>
               {this.getStepContent(stepIndex)}
-              <div style={{
-                marginTop: 12
-              }}>
+              <div
+                style={{
+                  marginTop: 12
+                }}
+              >
                 <FlatButton
                   label="Tilbake"
                   disabled={stepIndex === 0}
                   onClick={this.handlePrev}
                   style={{
-                  marginRight: 12
-                }}/>
+                    marginRight: 12
+                  }}
+                />
                 <RaisedButton
-                  label={stepIndex === 2
-                  ? 'Let etter sekvens'
-                  : 'Neste'}
+                  label={stepIndex === 2 ? "Let etter sekvens" : "Neste"}
                   primary={true}
-                  onClick={stepIndex === 2
-                  ? this.calculatePWMMatrix
-                  : this.handleNext}/>
+                  onClick={
+                    stepIndex === 2 ? this.calculatePWMMatrix : this.handleNext
+                  }
+                />
+                {displayHelpButton ? (
+                   <div style={{
+                     marginTop: 20
+                   }}>
+                   <RaisedButton label="Hjelp" onClick={this.handleOpen} />
+                     <Dialog
+                       title="Informasjon"
+                       actions={actions}
+                       modal={false}
+                       open={this.state.open}
+                       onRequestClose={this.handleClose}>
+                       Noe tekst som beskriver grafen her.
+                     </Dialog>
+                     </div>
+                ):(
+                  <div></div>
+                )}
+               
               </div>
-            </div>}
+            </div>
+          )}
         </div>
-        <div>
-          {graph}
-        </div>
+        <div>{graph}</div>
+        <div>{graph}</div>
       </div>
     );
   }

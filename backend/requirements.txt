@@ -1,4 +1,4 @@
+gunicorn
 flask==0.12.2
 requests==2.18.4
-numpy==1.14.2
-flask_cors==3.03
+flask_cors==3.0.3

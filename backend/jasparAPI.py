@@ -1,6 +1,6 @@
 import requests
-
-import numpy as np
+from functools import reduce
+import copy
 import math
 
 
@@ -34,7 +34,13 @@ def get_pfm_of_matrix(matrix='MA0634.1', bg=0.25):
     for key, value in pfm.items():
         arr.append(value)
 
-    total = np.sum(arr, axis=0)[0]
+    def sum(x, y):
+        for i in range(len(x)):
+            x[i] += y[i]
+        return x
+
+    total = reduce(lambda x, y: sum(x, y), copy.deepcopy(arr))[0]
+
     newRow = []
     i= 0
     for row in arr:
@@ -88,4 +94,3 @@ def calculate_seq(matrices, sequence, bg):
         else:
             m[matrix] = [get_sequence_probability_from_pwm(get_pfm_of_matrix(matrix, bg), sequence.upper())]
     return m
-

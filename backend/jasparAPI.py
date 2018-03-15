@@ -5,10 +5,7 @@ import math
 
 
 def get_all_possible_matrixes():
-    print("Doing request")
     r = requests.get("http://jaspar.genereg.net/api/v1/matrix/?page_size=800&tax_id=9606")
-
-    print("Request done")
 
     matrix_id = []
     for matrix in r.json()['results']:
@@ -65,16 +62,18 @@ def get_sequence_probability_from_pwm(pwm, sequence):
     for i in range(len(sequence)-length_of_motif):
         seq_score = sum([pwm[sequence[j]][j-i] for j in range(i, i+length_of_motif)])
         prob[i] = seq_score
-    print(prob)
-    #maxProb = max(prob)
-    #minProb = min(prob)
-    #prob = [(ele-minProb)/(maxProb-minProb) for ele in prob]
-    #print(prob)
+
     return prob
 
-#print(get_sequence_probability_from_pwm(get_pfm_of_matrix('MA0004.1'), "agtCACGTGttcc".upper()))
 
 def calculate_seq(matrices, sequence, bg):
+    """
+
+    :param matrices: A list of binding motifs to search for
+    :param sequence: a list of sequences to search in
+    :param bg: A background distribution for the bases
+    :return: Score for each binding motif, in each sequence
+    """
     m = {}
     for matrix in matrices:
         print(matrix)

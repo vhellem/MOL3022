@@ -26,6 +26,7 @@ def calculate():
 
     data = request.json
 
+    #Splits sequence data if there are multiple sequences. 
     sequenceData = data['sequence'].strip()
 
     if ";" in sequenceData:

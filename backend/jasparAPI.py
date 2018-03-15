@@ -41,7 +41,6 @@ def get_pfm_of_matrix(matrix='MA0634.1', bg=0.25):
 
     total = reduce(lambda x, y: sum(x, y), copy.deepcopy(arr))[0]
 
-    print('3',total)
     newRow = []
     i= 0
     for row in arr:

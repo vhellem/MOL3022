@@ -32,7 +32,7 @@ export default class TestData extends Component {
   }
 
   componentDidMount() {
-    fetch("https://mol3022-backend.herokuapp.com/matrices", {
+    fetch("http://localhost:5000/matrices", {
       method: "GET",
       headers: {
         Accept: "application/json",
@@ -57,7 +57,7 @@ export default class TestData extends Component {
 
   calculatePWMMatrix() {
     this.setState({ loading: true });
-    fetch("https://mol3022-backend.herokuapp.com/calculate", {
+    fetch("http://localhost:5000/calculate", {
       method: "POST",
       body: JSON.stringify({
         sequence: this.state.inputValue,
@@ -195,51 +195,15 @@ export default class TestData extends Component {
       ? Object.keys(this.state.results).map((key, index) => {
           return this.state.results[key].map((array, index) => {
             return (
-              <div>
+              <div style={{paddingTop: 20}}>
                 <p>
-                  Resultat for om binding "{key}" eksisterer i sekvens "{
-                    sequences[index]
-                  }"
+                  Resultat for om binding {key} eksisterer i sekvens nummer {parseInt(index+1)}
                 </p>
                 <Bar
                   options={{
-                    legend: {
-                      display: true
-                    },
-                    scales: {
-                      xAxes: [
-                        {
-                          scaleLabel: {
-                            display: true,
-                            labelString: "Weeks"
-                          }
-                        }
-                      ],
-                      yAxes: [
-                        {
-                          scaleLabel: {
-                            display: true,
-                            labelString: "Lalala"
-                          }
-                        }
-                      ]
-                    }
-                  }}
-                  data={{
-                    labels: array.map((_, index) => index),
-                    datasets: [
-                      {
-                        backgroundColor: "rgba(31,188,209,0.2)",
-                        data: array
-                      }
-                    ]
-                  }}
-                    width={100}
-                    height={100}
-                    options={{
                     pan: {
                       enabled: true,
-                      mode: 'x'
+                      mode: 'xy'
                     },
                     zoom: {
                       enabled: true,
@@ -262,12 +226,23 @@ export default class TestData extends Component {
                         {
                           scaleLabel: {
                             display: true,
-                            labelString: "Verdi"
+                            labelString: "Score"
                           }
                         }
                       ]
                     }
                   }}
+                  data={{
+                    labels: array.map((_, index) => index),
+                    datasets: [
+                      {
+                        backgroundColor: "rgba(31,188,209,0.2)",
+                        data: array
+                      }
+                    ]
+                  }}
+                    width={100}
+                    height={100}
                 />
               </div>
             );
@@ -279,7 +254,7 @@ export default class TestData extends Component {
     const contentStyle = {
       margin: "0 16px"
     };
-    const actions = [< FlatButton label = "Cancel" primary = {
+    const actions = [< FlatButton label = "Lukk" primary = {
         true
       }
       onClick = {
@@ -326,7 +301,7 @@ export default class TestData extends Component {
                   marginTop: 12
                 }}
               >
-                <FlatButton
+                <RaisedButton
                   label="Tilbake"
                   disabled={stepIndex === 0}
                   onClick={this.handlePrev}
@@ -343,16 +318,16 @@ export default class TestData extends Component {
                 />
                 {displayHelpButton ? (
                    <div style={{
-                     marginTop: 20
+                     paddingTop: 30
                    }}>
-                   <RaisedButton label="Hjelp" onClick={this.handleOpen} />
+                   <RaisedButton label="Forklaring" onClick={this.handleOpen} />
                      <Dialog
                        title="Informasjon"
                        actions={actions}
                        modal={false}
                        open={this.state.open}
                        onRequestClose={this.handleClose}>
-                       Noe tekst som beskriver grafen her.
+                       Det er mulig å zoome i Bar-grafen ved å for eksempel bruke touchpad-en. Y-aksen viser score for om det eksisterer et bindingssete for en gitt posisjon, mens x-aksen viser hvilken posisjon det er snakk om. 
                      </Dialog>
                      </div>
                 ):(
@@ -363,7 +338,6 @@ export default class TestData extends Component {
             </div>
           )}
         </div>
-        <div>{graph}</div>
         <div>{graph}</div>
       </div>
     );

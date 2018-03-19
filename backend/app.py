@@ -7,6 +7,10 @@ from json import dumps
 app = Flask(__name__)
 CORS(app)
 
+@app.route("/")
+def index():
+    return ('<p>This api exposes 2 end points: `/matrices` and `/calculate`.\nCheck out the <a href="https://mol3022-frontend.herokuapp.com">frontend</a> to use them!</p>')
+
 
 @app.route("/matrices")
 def matrices():

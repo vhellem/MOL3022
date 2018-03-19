@@ -1,13 +1,13 @@
-import React, { Component}  from 'react';
-import TextField from 'material-ui/TextField';
-import RaisedButton from 'material-ui/RaisedButton';
-import FlatButton from 'material-ui/FlatButton';
-import Dialog from 'material-ui/Dialog';
-import { Step, Stepper, StepLabel } from 'material-ui/Stepper';
-import { Bar, Chart } from 'react-chartjs-2'
-import Select from 'react-select';
-import 'react-select/dist/react-select.css';
-import * as zoom from 'chartjs-plugin-zoom';
+import React, { Component } from "react";
+import TextField from "material-ui/TextField";
+import RaisedButton from "material-ui/RaisedButton";
+import FlatButton from "material-ui/FlatButton";
+import Dialog from "material-ui/Dialog";
+import { Step, Stepper, StepLabel } from "material-ui/Stepper";
+import { Bar, Chart } from "react-chartjs-2";
+import Select from "react-select";
+import "react-select/dist/react-select.css";
+import * as zoom from "chartjs-plugin-zoom";
 
 export default class TestData extends Component {
   constructor(props) {
@@ -29,10 +29,18 @@ export default class TestData extends Component {
     this.setSelectedMatrix = this.setSelectedMatrix.bind(this);
     this.handleBackgroundChange = this.handleBackgroundChange.bind(this);
     this.handleSequenceInputChange = this.handleSequenceInputChange.bind(this);
+
+    const hostname = window && window.location && window.location.hostname;
+
+    if (hostname === "mol3022-frontend.herokuapp.com") {
+      this.API_ROOT = "https://mol3022-backend.herokuapp.com";
+    } else {
+      this.API_ROOT = "http://localhost:5000";
+    }
   }
 
   componentDidMount() {
-    fetch("http://localhost:5000/matrices", {
+    fetch(`${this.API_ROOT}/matrices`, {
       method: "GET",
       headers: {
         Accept: "application/json",
@@ -41,26 +49,29 @@ export default class TestData extends Component {
     })
       .then(results => results.json())
       .then(data => {
-        console.log("test");
         console.log(data);
         this.setState({ loading: false });
         const matrices = data.map(matrix => {
-          return {label: matrix, value: matrix};
+          return { label: matrix, value: matrix };
         });
         console.log(matrices);
         this.setState({ matrices });
       });
-    Chart
-      .plugins
-      .register(zoom)
+    Chart.plugins.register(zoom);
   }
 
   calculatePWMMatrix() {
+    let sequences = this.state.inputValue;
+    if (sequences.indexOf(";") !== -1) {
+      sequences = sequences.split(";").reduce((x, y) => x + (y ? `;${y}` : ""));
+      sequences = sequences.charAt(0) === ";" ? sequences.substr(1) : sequences;
+    }
+
     this.setState({ loading: true });
-    fetch("http://localhost:5000/calculate", {
+    fetch(`${this.API_ROOT}/calculate`, {
       method: "POST",
       body: JSON.stringify({
-        sequence: this.state.inputValue,
+        sequence: sequences,
         matrix: this.state.selectedMatrix.map(matrix => {
           return matrix.value;
         }),
@@ -110,12 +121,12 @@ export default class TestData extends Component {
   };
 
   handleOpen = () => {
-    this.setState({open: true});
-  }
+    this.setState({ open: true });
+  };
 
   handleClose = () => {
-    this.setState({open: false})
-  }
+    this.setState({ open: false });
+  };
 
   handleSequenceInputChange(e) {
     this.setState({
@@ -145,8 +156,8 @@ export default class TestData extends Component {
           <div>
             <TextField
               style={{
-              textAlign: 'left'
-            }}
+                textAlign: "left"
+              }}
               floatingLabelText="Skriv inn DNA-sekvens(er), separert med semikolon:"
               floatingLabelFixed={true}
               hintText=""
@@ -195,19 +206,20 @@ export default class TestData extends Component {
       ? Object.keys(this.state.results).map((key, index) => {
           return this.state.results[key].map((array, index) => {
             return (
-              <div style={{paddingTop: 20}}>
+              <div style={{ paddingTop: 20 }}>
                 <p>
-                  Resultat for om binding {key} eksisterer i sekvens nummer {parseInt(index+1)}
+                  Resultat for om binding {key} eksisterer i sekvens nummer{" "}
+                  {parseInt(index + 1)}
                 </p>
                 <Bar
                   options={{
                     pan: {
                       enabled: true,
-                      mode: 'xy'
+                      mode: "xy"
                     },
                     zoom: {
                       enabled: true,
-                      mode: 'x'
+                      mode: "x"
                     },
                     legend: {
                       display: false
@@ -241,8 +253,8 @@ export default class TestData extends Component {
                       }
                     ]
                   }}
-                    width={100}
-                    height={100}
+                  width={100}
+                  height={100}
                 />
               </div>
             );
@@ -254,12 +266,9 @@ export default class TestData extends Component {
     const contentStyle = {
       margin: "0 16px"
     };
-    const actions = [< FlatButton label = "Lukk" primary = {
-        true
-      }
-      onClick = {
-        this.handleClose
-      } />];
+    const actions = [
+      <FlatButton label="Lukk" primary={true} onClick={this.handleClose} />
+    ];
 
     const displayHelpButton = this.state.results !== undefined;
     return (
@@ -288,12 +297,11 @@ export default class TestData extends Component {
                 href="#"
                 onClick={event => {
                   event.preventDefault();
-                  this.setState({stepIndex: 0, finished: false});
-                }}>
-                </a>
-              </p>
-
-              ): (
+                  this.setState({ stepIndex: 0, finished: false });
+                }}
+              />
+            </p>
+          ) : (
             <div>
               {this.getStepContent(stepIndex)}
               <div
@@ -317,23 +325,31 @@ export default class TestData extends Component {
                   }
                 />
                 {displayHelpButton ? (
-                   <div style={{
-                     paddingTop: 30
-                   }}>
-                   <RaisedButton label="Forklaring" onClick={this.handleOpen} />
-                     <Dialog
-                       title="Informasjon"
-                       actions={actions}
-                       modal={false}
-                       open={this.state.open}
-                       onRequestClose={this.handleClose}>
-                       Det er mulig å zoome i Bar-grafen ved å for eksempel bruke touchpad-en. Y-aksen viser score for om det eksisterer et bindingssete for en gitt posisjon, mens x-aksen viser hvilken posisjon det er snakk om. 
-                     </Dialog>
-                     </div>
-                ):(
-                  <div></div>
+                  <div
+                    style={{
+                      paddingTop: 30
+                    }}
+                  >
+                    <RaisedButton
+                      label="Forklaring"
+                      onClick={this.handleOpen}
+                    />
+                    <Dialog
+                      title="Informasjon"
+                      actions={actions}
+                      modal={false}
+                      open={this.state.open}
+                      onRequestClose={this.handleClose}
+                    >
+                      Det er mulig å zoome i Bar-grafen ved å for eksempel bruke
+                      touchpad-en. Y-aksen viser score for om det eksisterer et
+                      bindingssete for en gitt posisjon, mens x-aksen viser
+                      hvilken posisjon det er snakk om.
+                    </Dialog>
+                  </div>
+                ) : (
+                  <div />
                 )}
-               
               </div>
             </div>
           )}

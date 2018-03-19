@@ -4,7 +4,7 @@ import copy
 import math
 
 
-def get_all_possible_matrixes():
+def get_all_possible_matrices():
     r = requests.get("http://jaspar.genereg.net/api/v1/matrix/?page_size=800&tax_id=9606")
 
     matrix_id = []

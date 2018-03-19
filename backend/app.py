@@ -14,7 +14,7 @@ def index():
 
 @app.route("/matrices")
 def matrices():
-    r = get_matrices()
+    r = get_all_possible_matrices()
     return jsonify(r)
 
 
@@ -30,10 +30,6 @@ def calculate():
         sequenceData = sequenceData.split(";")
 
     return jsonify(calculate_seq(data['matrix'], sequenceData, float(data['background'])))
-
-def get_matrices():
-    r = get_all_possible_matrixes()
-    return r
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0')

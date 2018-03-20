@@ -14,7 +14,7 @@ def get_all_possible_matrices():
 
 
 def pwm(freq, total, bg=0.25):
-    p = (freq+math.sqrt(total)*1/4)/(total+(4*(math.sqrt(total)*1/4)))
+    p = (freq+math.sqrt(total)*1/4)/(total+(math.sqrt(total)))
     return math.log(p/bg, 2)
 
 def get_pfm_of_matrix(matrix='MA0634.1', bg=0.25):
@@ -63,7 +63,7 @@ def get_sequence_probability_from_pwm(pwm, sequence):
     :return: A probability of the motif at all given positions in the sequence
     """
     length_of_motif = len(pwm['A'])
-    prob = [0]*(len(sequence)-length_of_motif)
+    prob = [0]*((len(sequence)-length_of_motif)+1)
 
     for i in range((len(sequence)-length_of_motif)+1):
         seq_score = sum([pwm[sequence[j]][j-i] for j in range(i, i+length_of_motif)])

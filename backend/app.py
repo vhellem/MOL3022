@@ -1,5 +1,5 @@
 import requests
-from jasparAPI import get_all_possible_matrixes, calculate_seq
+from jasparAPI import get_all_possible_matrices, calculate_seq
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from json import dumps

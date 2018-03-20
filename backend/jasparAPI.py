@@ -65,7 +65,7 @@ def get_sequence_probability_from_pwm(pwm, sequence):
     length_of_motif = len(pwm['A'])
     prob = [0]*(len(sequence)-length_of_motif)
 
-    for i in range(len(sequence)-length_of_motif):
+    for i in range((len(sequence)-length_of_motif)+1):
         seq_score = sum([pwm[sequence[j]][j-i] for j in range(i, i+length_of_motif)])
         prob[i] = seq_score
 

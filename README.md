@@ -11,19 +11,19 @@
 In the backend folder. 
 
 ```
-python3~-m~venv~venv
+python3 -m venv venv
 ```
 
 ```
-source~venv/binb/activate
+source venv/binb/activate
 ```
 
 ```
-pip~install~-r~requirements.txt
+pip install -r requirements.txt
 ```
 
 ```
-python~app.py
+python app.py
 ```
 
 ### Frontend: 

@@ -4,9 +4,9 @@
 
 [mol3022-frontend.herokuapp.com](mol3022-frontend.herokuapp.com)
 
-To run. 
+##  Running. 
 
-# Backend: 
+### Backend: 
 
 In the backend folder. 
 
@@ -26,7 +26,7 @@ pip~install~-r~requirements.txt
 python~app.py
 ```
 
-# Frontend: 
+### Frontend: 
 
 With yarn installed. (npm install -g yarn) 
 

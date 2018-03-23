@@ -341,10 +341,14 @@ export default class TestData extends Component {
                       open={this.state.open}
                       onRequestClose={this.handleClose}
                     >
-                      Det er mulig å zoome i Bar-grafen ved å for eksempel bruke
-                      touchpad-en. Y-aksen viser score for om det eksisterer et
-                      bindingssete for en gitt posisjon, mens x-aksen viser
-                      hvilken posisjon det er snakk om.
+                      Det er mulig å zoome i grafene ved å for eksempel bruke
+                      touchpad-en eller å scrolle med musa. Man kan også dra grafen
+                      opp og ned eller til høyre og venstre for å flytte på den.
+                      Y-aksen viser score for om det eksisterer et bindingssete
+                      for en gitt posisjon, mens X-aksen viser hvilken posisjon
+                      det er snakk om. Hvis en sekvens er over 1000 tegn lang så
+                      vil grafen bli så stor at søylene ikke er synlige. Zoom inn
+                      til ca. 700 posisjoner vises, så vil søylene komme til syne.
                     </Dialog>
                   </div>
                 ) : (
